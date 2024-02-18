@@ -1,0 +1,20 @@
+@import 'main';
+@import "my-dark-theme";
+
+/* append your custom style below */
+
+// body {
+//   color: #e4e4e1;
+// }
+
+figure.highlight {
+  padding: 10px;
+}
+
+figure pre span {
+    font-size: 1.1rem;
+}
+
+.content {
+    font-size: 1.15rem;
+}
