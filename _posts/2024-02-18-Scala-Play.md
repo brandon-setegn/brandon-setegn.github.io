@@ -6,7 +6,7 @@ mermaid: true
 tags: chirpy
 ---
 
-The Play Framework is one of many popular REST API frameworks in the Scala ecosystem.  Play Framework may not be as new and shiny as some aschronous composable runtimes such as [Cats Effect and ZIO](https://softwaremill.com/cats-effect-vs-zio/), its a good choice for those looking to do OOP in Scala.
+The Play Framework is one of many popular REST API frameworks in the Scala ecosystem.  Play Framework may not be as new and shiny as some frameworks built off of aschronous composable runtimes, such as [Cats Effect and ZIO](https://softwaremill.com/cats-effect-vs-zio/), but its a good choice for those looking to do OOP in Scala.
 
 
 Example Repo: [Scala Play Example](https://github.com/brandon-setegn/scala-play-example/)
