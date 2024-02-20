@@ -1,9 +1,9 @@
 ---
 title:  "Deploying to Cloud Run with Terraform"
 date:   2024-02-18 20:00:00 -0500
-categories: github jekyll
+categories: [terraform, cloud run]
 mermaid: true
-tags: chirpy
+tags: [scala, play framework, GCP, terraform, cloud run]
 ---
 
 Clound Run is a popular choice for serverless computing on GCP.  It allows you to easily deploy and run a Docker Image with very little work.  It is much simpler than maintaing your own Kubernetes cluster.  There is even a [source code based deploy](https://cloud.google.com/run/docs/deploying-source-code) option if you don't want to make your own image.
