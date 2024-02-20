@@ -144,6 +144,7 @@ The Scala application requires two enviornment variables to run.  These **MUST**
 |*APPLICATION_SECRET*|Secret key used by [Play Framework](https://www.playframework.com/documentation/3.0.x/ApplicationSecret)|
 |*ALLOWED_HOST*|[Hosts allowed to connect to service](https://www.playframework.com/documentation/3.0.x/AllowedHostsFilter)|
 
+The *APPLICATION_SECRET* can be set to any approriate length string necessary.  However,*ALLOWED_HOST* must be set to the final URL of our Cloud Run service.  This can be found by running `terraform plan` as described below.  One of the outputs will be the `service_url` needed to set the *ALLOWED_HOST* environment variable.
 
 
 > Note: The docker tag used previously is the same used for the Cloud Run `image`
@@ -199,4 +200,42 @@ resource "google_cloud_run_service_iam_binding" "binding" {
     "allUsers"
   ]
 }
+```
+
+## Running Terraform
+The sample project comes with the `Terraform` files required to run and deploy the `Cloud Run` service.  All you need to have completed to run the `Terraform` step is to have configured and installed `Terraform`.
+
+### Test the Terraform Module
+To simply see the output of the `Terraform` process in our console, run the following command.  You will be asked to input your GCP project id.
+```bash
+terraform plan
+# Output below
+var.project_id
+  The project ID to deploy to
+
+  Enter a value: {your-project-id}
+```
+
+### Running the Terraform Module
+To actually create the `Cloud Run` service, run this command.  You will be asked to input your GCP project id.
+```bash
+terraform apply
+# Output below
+var.project_id
+  The project ID to deploy to
+
+  Enter a value: {your-project-id}
+  ....
+# Final Line outputted hsould be
+service_url = "https://{your-unique-cloud-run-url}.app"
+```
+
+### Testing Our Cloud Run Service
+Simply navigate to the `service_url` outputted from our `terraform apply` command.  You should be greated with `Hello World`.
+
+## Cleaning Up Our Service
+⚠️Make sure to clean up your project so that you are not billed for the service.
+```
+# Destroy the GCP resources created by Terraform
+terraform destroy
 ```
