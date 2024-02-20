@@ -101,6 +101,7 @@ This post won't cover all the intricacies of setting up your system to run `gclo
 
 
 ## Add Terraform to the Project
+![Terraform](/assets/img/Terraform.png){: width="60" height="67" .w-12 .left}
 This sample project already has the `Terraform` files you need to deploy to Cloud Run.  All of the `Terraform` files go in the `terraform` directory in the project.  This is where you will run `Terraform` commands from the command line.
 
 #### Terraform Project Setup
@@ -114,7 +115,7 @@ This sample project already has the `Terraform` files you need to deploy to Clou
 
 
 ## Configure Terraform for Cloud Run
-This post will only cover the specifics of using `Terraform` for `Cloud Run`.
+This post will only cover the specifics of using `Terraform` for `Cloud Run`.  For details on the *output.tf* and *variables.tf* files checkout the tutorial from `Terraform` above.
 
 ### main.tf
 This is our module that will be run to deploy to `Cloud Run`.  There are two sections to our `main.tf`, *service_account* and *cloud_run*.
