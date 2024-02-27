@@ -8,7 +8,7 @@ image:
   path: /assets/img/CloudRunTerraform.png
 ---
 
-Clound Run is a popular choice for serverless computing on GCP.  It allows you to easily deploy and run a Docker Image with very little work.  It is much simpler than maintaing your own Kubernetes cluster.  There is even a [source code based deploy](https://cloud.google.com/run/docs/deploying-source-code) option if you don't want to make your own image.
+Cloud Run is a popular choice for serverless computing on GCP.  It allows you to easily deploy and run a Docker Image with very little work.  It is much simpler than maintaing your own Kubernetes cluster.  There is even a [source code based deploy](https://cloud.google.com/run/docs/deploying-source-code) option if you don't want to make your own image.
 
 Cloud Run is a great alternative to using App Engine and comes recommended from Google.
 [GCP: App Engine vs Cloud Run](https://cloud.google.com/appengine/migration-center/run/compare-gae-with-run)
