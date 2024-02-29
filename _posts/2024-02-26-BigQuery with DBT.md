@@ -32,7 +32,7 @@ _Data Dynamics_
 3. Click `Generate Files` to download a zip file with the performance history
 
 #### Column Headers
-We'll need a description of the columns to understand what we are loading: [Single-Family Loan Performance Dataset and Credit Risk Transfer - Glossary and File Layout](https://capitalmarkets.fanniemae.com/media/6931/display).  This data isn't very usuable in its current form, so we will use Excel to extract the data from PDF.  To extract the data from Excel follow these steps:
+We'll need a description of the columns to understand what we are loading: [Single-Family Loan Performance Dataset and Credit Risk Transfer - Glossary and File Layout](https://capitalmarkets.fanniemae.com/media/6931/display).  This data isn't very usable in its current form, so we will use Excel to extract the data from PDF.  To extract the data from Excel follow these steps:
 1. Download the [header PDF file](https://capitalmarkets.fanniemae.com/media/6931/display)
 2. Open up a new, empty worksheet in Excel
 3. Go to the `Data` tab
