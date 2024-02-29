@@ -53,10 +53,22 @@ The data we've retrieved from Fannie Mae needs to be sent to Google Cloud Storag
 ```bash
  gsutil cp * gs://{your_bucket_name}/{cas_deal_name}
 ```
+4. Now verify you can see your files in the [GCP Console](https://console.cloud.google.com/)
 
+### Creating a BigQuery Table from CSVs
+The next step is to create a single table for the multiple CSV files we just uploaded.  The difficult part is that we will need to specify a schema for the table.  We have to make sure the schema fits the data perfectly as there are no column headers in the CSV files.
 
-
-
-
-> An example heders file can be found here `tip` type prompt.
+The following SQL can be run in the BigQuery Console to load a single table from all the csv files.
+```sql
+LOAD DATA OVERWRITE {dataset_name}.{security_name}
+(reference_pool_id STRING,
+loan_identifier STRING,
+...
+)
+FROM FILES (
+  format = 'CSV',
+  field_delimiter = '|',
+  uris = ['gs://{your-bucket}/{folder}/*.csv']);
+```
+> To find an example with all the columns, checkout this [sql script](https://github.com/brandon-setegn/loan-performance-dbt/blob/master/sql/create_table_example.sql).
 {: .prompt-tip }
