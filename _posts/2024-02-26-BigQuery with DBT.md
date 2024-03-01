@@ -80,8 +80,40 @@ select * from {dataset_name}.{security_name} limit 100;
 ```
 
 ## DBT
+[DBT (Data Build Tool)](https://www.getdbt.com/) is a powerful addition in the modern data stack, enabling analytics engineers to convert raw data in their warehouses into reliable, actionable information. It harnesses the familiar language of SQL, allowing users to define, test, and document their data transformations in a version-controlled environment, promoting collaboration and ensuring data accuracy.  With DBT, teams can concentrate more on extracting insights and less on managing data pipelines, speeding up the journey to data-driven decision making.
+
+### Installation
+
+1. Setup dbt environment:
+Assuming python has been setup locally, create a virtual env
+```shell
+virtualenv dbt-project-env
+source dbt-project-env/bin/activate
+```
+2. Install bigquery adapter for dbt, this will also install dbt-core
+```shell
+pip install dbt-bigquery
+```
+3. Initialize the dbt project and set `dbt_dv_data` as the project name and select `1`
+to choose the postgres adapter
+```shell
+dbt init
+```
+4. Follow the prompts to configure DBT
+5. Move files from newly created folder.  Unfortunately DBT creates everything in a subfolder which isn't usefull since its easier having it at the same level as the
+```shell
+mv {dbt_project_folder_created}/* .
+rmdir {dbt_project_folder_created}
+```
+6. Test with `dbt debug`
+```shell
+dbt debug
+```
+If your connection to BigQuery is setup properly, you should see `All checks passed!`.
 
 
+### Defining Our First Source
+We will use the table we created before as our source.
 
 > Work in progress...more coming soon.
 {: .prompt-warning  }
