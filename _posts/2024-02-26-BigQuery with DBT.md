@@ -8,9 +8,9 @@ image:
   path: /assets/img/bigquery-dbt.png
 ---
 
-Cloud tools have reconstructed the modern data stack.  Data warehouses such as [Google BigQuery](https://cloud.google.com/bigquery) and [Snowflake](https://www.snowflake.com/en/) provide scalable solutions for storing, analyzing, and managing large volumes of data, making them essential tools for data-driven processes.  Previously, suites of tools existed to transform your data before loading it into your warehouse.  It was either too difficult or too costly to load raw into data warehouse.  Now, we can easily load data into the warehouse first, transforming inside the warehouse with [DBT (Data Build Tool)](https://www.getdbt.com/product/what-is-dbt).
+Cloud tools have reconstructed the data stack.  Data warehouses such as [Google BigQuery](https://cloud.google.com/bigquery) and [Snowflake](https://www.snowflake.com/en/) provide scalable solutions for storing, analyzing, and managing large volumes of data, making them essential tools for data-driven processes.  Previously, suites of tools existed to transform your data before loading it into your warehouse.  It was either too difficult or too costly to load raw into data warehouse.  Now, we can easily load data into the warehouse first, transforming inside the warehouse with [DBT (Data Build Tool)](https://www.getdbt.com/product/what-is-dbt).  Running SQL in BigQuery offers significant advantages over something like Spark, including fully managed infrastructure, automatic scaling, and the ability to run SQL queries directly on stored data without the need to move it.
 
-> 💡**Old: Bring the data to the compute.  New: we bring the compute to the data.**
+> 💡**Before: Bring the data to the compute.  After: we bring the compute to the data.**
 
 Included below is an example of how to load data into BigQuery and transform it with DBT.  [Historical Loan Performance data for the CAS deals from Fannie Mae](https://capitalmarkets.fanniemae.com/credit-risk-transfer/single-family-credit-risk-transfer/connecticut-avenue-securities) will be used.  It will be loaded into BigQuery in its raw form and transformed with SQL generated from DBT to make it usable.
 
@@ -28,8 +28,9 @@ The data used in this example comes from Fannie Mae.  It will use the historical
 ![Fannie Mae Download](/assets/img/2024-02-26-FannieMaeDataDynamics.png){: width="624" height="257" }
 _Data Dynamics_
 1. Go to [Fannie Mae - Data Dynamics - Create a Custom CAS Download](https://datadynamics.fanniemae.com/data-dynamics/#/slicer/CAS)
-2. Select a deal that is at least 6 months old
-3. Click `Generate Files` to download a zip file with the performance history
+2. Select a deal that is at least 6 months old, a deal with 1-2 years of history will be large enough but not too large
+3. Select Data Type - select only `Remittance Data`
+4. Click `Generate Files` to download a zip file with the performance history
 
 #### Column Headers
 We'll need a description of the columns to understand what we are loading: [Single-Family Loan Performance Dataset and Credit Risk Transfer - Glossary and File Layout](https://capitalmarkets.fanniemae.com/media/6931/display).  This data isn't very usable in its current form, so we will use Excel to extract the data from PDF.  To extract the data from Excel follow these steps:
@@ -42,7 +43,7 @@ We'll need a description of the columns to understand what we are loading: [Sing
 7. Several options will be available on how to import the data, choose the one that works best for you
 8. Double check that all columns from the file have been imported to Excel as some may have been cut off
 
-Now, we can use this information to help import our data into BigQuery.
+Now, we can use this information to help import our data into BigQuery.  This will be used later on.
 
 
 ### Uploading Data to Google Cloud Storage
@@ -72,3 +73,15 @@ FROM FILES (
 ```
 > To find an example with all the columns, checkout this [sql script](https://github.com/brandon-setegn/loan-performance-dbt/blob/master/sql/create_table_example.sql).
 {: .prompt-tip }
+
+Now our table has been created, query it to explore the data.
+```sql
+select * from {dataset_name}.{security_name} limit 100;
+```
+
+## DBT
+
+
+
+> Work in progress...more coming soon.
+{: .prompt-warning  }
