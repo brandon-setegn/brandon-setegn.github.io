@@ -10,9 +10,12 @@ image:
 
 Cloud tools have reconstructed the data stack.  Data warehouses such as [Google BigQuery](https://cloud.google.com/bigquery) and [Snowflake](https://www.snowflake.com/en/) provide scalable solutions for storing, analyzing, and managing large volumes of data, making them essential tools for data-driven processes.  Previously, suites of tools existed to transform your data before loading it into your warehouse.  It was either too difficult or too costly to load raw into data warehouse.  Now, we can easily load data into the warehouse first, transforming inside the warehouse with [DBT (Data Build Tool)](https://www.getdbt.com/product/what-is-dbt).  Running SQL in BigQuery offers significant advantages over something like Spark, including fully managed infrastructure, automatic scaling, and the ability to run SQL queries directly on stored data without the need to move it.
 
-> 💡**Previously: Bring the data to the compute.  Now: we bring the compute to the data.**
+> 💡**Previously: Big data solutions brought the data to the compute.  Now: We bring the compute to the data by deploying our code directly to the data warehouse.**
 
 Included below is an example of how to load data into BigQuery and transform it with DBT.  [Historical Loan Performance data for the CAS deals from Fannie Mae](https://capitalmarkets.fanniemae.com/credit-risk-transfer/single-family-credit-risk-transfer/connecticut-avenue-securities) will be used.  It will be loaded into BigQuery in its raw form and transformed with SQL generated from DBT to make it usable.
+
+## Source Code
+> Code for this post can be found on GitHub: [GitHub: DBT Project](https://github.com/brandon-setegn/loan-performance-dbt/tree/master/dbt-project)
 
 ## Google BigQuery
 ### Prerequisites
@@ -139,19 +142,32 @@ Our first model will reference the source table defined in our yaml file.  It wi
 
 ```sql
 {% raw %}{{ config(materialized = 'view')}}
-WITH datecte AS (
+WITH with_period AS (
     SELECT
-        PARSE_DATE('%m%Y', monthly_reporting_period) AS reporting_period,
-        *
+        PARSE_DATE('%m%Y', monthly_reporting_period) AS reporting_period
+        ,CAST(current_loan_delinquency_status AS INT64) as current_loan_delinquency_status
+        ,* EXCEPT(current_loan_delinquency_status)
     FROM
         {{ source('cas_loanperf', 'cas_2022_r01_g1')}}
 )
 SELECT
-    *
+    reporting_period
+    ,current_actual_upb + unscheduled_principal_current AS scheduled_ending_balance
+    ,SUM(unscheduled_principal_current) OVER (PARTITION BY loan_identifier ORDER BY reporting_period
+        ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+    ) AS unscheduled_principal_cumulative
+    ,SUM(scheduled_principal_current) OVER (PARTITION BY loan_identifier ORDER BY reporting_period
+        ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+    ) AS scheduled_principal_cumulative
+    ,SUM(total_principal_current) OVER (PARTITION BY loan_identifier ORDER BY reporting_period
+        ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+    ) AS total_principal_cumulative
+    ,IF(current_loan_delinquency_status >= 2, 1, 0) as dq60plus
+    ,IF(current_loan_delinquency_status >= 3, 1, 0) as dq90plus
+    ,IF(current_loan_delinquency_status >= 4, 1, 0) as dq120plus
+    ,* EXCEPT (reporting_period)
 FROM
-    datecte
-ORDER BY
-    datecte.reporting_period{% endraw %}
+    with_period{% endraw %}
 ```
 
 ### Compile and Run the Model
@@ -167,7 +183,48 @@ After we've viewed our compiled SQL and are happy, we can run [dbt run](https://
 > `dbt run` will create the defined tables, views, and other objects in our data warehouse
 
 
+#### Materialization
+It is important to pick the proper [DBT Materializations](https://docs.getdbt.com/docs/build/materializations) for our model.
 
+> `Materializations` are strategies for persisting dbt models in a warehouse. There are five types of materializations built into dbt. 
 
-> Work in progress...more coming soon.
-{: .prompt-warning  }
+There are 5 types of materializations available in dbt:
+- table
+- view
+- incremental
+- ephemeral
+- materialized view
+
+The main two materializations you will use are table and view.  The first DBT model above uses the `view` materialization.  This means no data is written when the dbt pipeline is run, only the view is created or updated.  This is fine, but every time someone calls this view it will read all the data from the underlying table.  If this query takes a long time and uses too many resources, a `table` materialization may be appropriate.  In this case the output of the SQL defined in our dbt model will saved to a table.  
+
+For our second dbt model, the `table` materialization will be used.  This table aggregates the first table and will only have a few records.  So now when we run the dbt model, it will write data to this table.
+
+```sql
+{{ config(materialized = 'table')}}
+SELECT
+  reporting_period,
+  SUM(unscheduled_principal_current) / SUM(scheduled_ending_balance) AS smm,
+  (1 - POW(
+    (1 - (SUM(unscheduled_principal_current) / SUM(scheduled_ending_balance)))
+    ,12
+  )) * 100 as cpr,
+  SUM(scheduled_ending_balance) as scheduled_ending_balance,
+  SUM(unscheduled_principal_cumulative) as unscheduled_principal_cumulative,
+  SUM(scheduled_principal_cumulative) as scheduled_principal_cumulative,
+  SUM(total_principal_cumulative) as total_principal_cumulative,
+  countif(scheduled_ending_balance > 0) as active_loan_count,
+  count(*) as total_loan_count,
+  sum(dq60plus) as dq60plus,
+  sum(dq90plus) as dq90plus,
+  sum(dq120plus) as dq120plus
+FROM
+    {{ ref("cas_2022_r01_g1_clean")}}
+GROUP BY
+  reporting_period
+```
+
+## Wrapping Up
+This small example only touches the surface of some of the great features of DBT.  DBT will make managing your data warehouse much easier.  Tools such as the lineage view will make maintaining larger project easier.  Most importantly, by keeping the entire workflow in SQL we offload the hard work to the data warehouse.  This ensures our pipeline can grow as our requirements do.
+
+![DBT Lineage](/assets/img/2024-02-26-dbt-lineage.png){: width="700" height="100" }
+_DBT Lineage_
