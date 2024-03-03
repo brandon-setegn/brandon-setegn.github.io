@@ -200,7 +200,7 @@ The main two materializations you will use are table and view.  The first DBT mo
 For our second dbt model, the `table` materialization will be used.  This table aggregates the first table and will only have a few records.  So now when we run the dbt model, it will write data to this table.
 
 ```sql
-{{ config(materialized = 'table')}}
+{% raw %}{{ config(materialized = 'table')}}
 SELECT
   reporting_period,
   SUM(unscheduled_principal_current) / SUM(scheduled_ending_balance) AS smm,
@@ -220,7 +220,7 @@ SELECT
 FROM
     {{ ref("cas_2022_r01_g1_clean")}}
 GROUP BY
-  reporting_period
+  reporting_period{% endraw %}
 ```
 
 ## Wrapping Up
