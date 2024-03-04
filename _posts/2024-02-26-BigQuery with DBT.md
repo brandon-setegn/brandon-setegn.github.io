@@ -195,7 +195,7 @@ There are 5 types of materializations available in dbt:
 - ephemeral
 - materialized view
 
-The main two materializations you will use are table and view.  The first DBT model above uses the `view` materialization.  This means no data is written when the dbt pipeline is run, only the view is created or updated.  This is fine, but every time someone calls this view it will read all the data from the underlying table.  If this query takes a long time and uses too many resources, a `table` materialization may be appropriate.  In this case the output of the SQL defined in our dbt model will saved to a table.  
+The main two materializations you will use are `table` and `view`.  The first DBT model above uses the `view` materialization.  This means no data is written when the dbt pipeline is run, only the view is created or updated.  This is fine, but every time someone calls this view it will read all the data from the underlying table.  If this query takes a long time and uses too many resources, a `table` materialization may be appropriate.  In this case the output of the SQL defined in our dbt model will saved to a table.  
 
 For our second dbt model, the `table` materialization will be used.  This table aggregates the first table and will only have a few records.  So now when we run the dbt model, it will write data to this table.
 
