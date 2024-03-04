@@ -228,3 +228,8 @@ This small example only touches the surface of some of the great features of DBT
 
 ![DBT Lineage](/assets/img/2024-02-26-dbt-lineage.png){: width="700" height="100" }
 _DBT Lineage_
+
+## Display the Results in Plotly Dash
+What is the point of all this hard work if we can't show it off?  A quick and easy way to show some performance charts is with Plotly Dash.  Here is an example built with Plotly Dash and hosted in GCP Cloud Run.  Hopefully, they'll be time for a post about it soon 🤞.
+
+[Plotly Dash Hosted in Cloud Run](https://loan-performance-dash-bbzw5i4wwa-ue.a.run.app/)
