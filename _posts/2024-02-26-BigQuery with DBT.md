@@ -8,20 +8,19 @@ image:
   path: /assets/img/bigquery-dbt.png
 ---
 
-The shift to cloud computing has also led to a reimangined data stack.  Data warehouses such as [Google BigQuery](https://cloud.google.com/bigquery) and [Snowflake](https://www.snowflake.com/en/) provide scalable solutions for storing, analyzing, and managing large volumes of data, making them essential tools for data-driven processes.  Previously, suites of tools existed to transform your data before loading it into your warehouse.  It was either too difficult or too costly to load raw into your data warehouse.  Now, we can easily load data into the warehouse first, running our transformations inside the warehouse using SQL only.  Tools such as [DBT (Data Build Tool)](https://www.getdbt.com/product/what-is-dbt) help us manage this SQL.  Running SQL in BigQuery offers significant advantages over a solution such as Spark, including fully managed infrastructure, automatic scaling, and the ability to run SQL queries directly on stored data without the need to move it leading to improvements in both simplicity and speed.
+The shift to cloud computing has also led to a reimangined data stack.  Data warehouses such as [Google BigQuery](https://cloud.google.com/bigquery) and [Snowflake](https://www.snowflake.com/en/) provide scalable solutions for storing, analyzing, and managing large volumes of data, making them essential tools for data-driven processes.  Previously, suites of tools existed to transform your data before loading it into your warehouse.  It was either too difficult or too costly to load raw into your data warehouse.  Now, we can easily load data into the warehouse first, running our transformations inside the warehouse using SQL only.  Tools such as [DBT (Data Build Tool)](https://www.getdbt.com/product/what-is-dbt) help us manage this SQL.  Running SQL in BigQuery offers significant advantages over a solution such as Spark, including fully managed infrastructure, automatic scaling, and the ability to run SQL queries directly on stored data without the need to move it, leading to improvements in both speed and simplicity.
 
 > 💡**Previously: Big data solutions brought the data to the compute.  Now: We bring the compute to the data by deploying our code directly to the data warehouse.**
 
 Included below is an example of how to load data into BigQuery and transform it with DBT.  [Historical Loan Performance data for the CAS deals from Fannie Mae](https://capitalmarkets.fanniemae.com/credit-risk-transfer/single-family-credit-risk-transfer/connecticut-avenue-securities) will be used.  It will be loaded into BigQuery in its raw form and transformed with SQL generated from DBT to make it usable.
 
 ## Source Code
-> Code for this post can be found on GitHub: [GitHub: DBT Project](https://github.com/brandon-setegn/loan-performance-dbt/tree/master/dbt-project)
+> Code for this post can be found on [GitHub: DBT Project](https://github.com/brandon-setegn/loan-performance-dbt/tree/master/dbt-project)
 
 ## Google BigQuery
 ### Prerequisites
 If you would like to try this example yourself, you must first setup BigQuery in Google Cloud Platform (GCP).
-> Follow this guide to get started with BigQuery: [Load and query data with the Google Cloud console](https://cloud.google.com/bigquery/docs/quickstarts/load-data-console)
-You will also need to setup Google Cloud Storage to have a bucket to upload the raw data to.
+> Follow this guide to get started with BigQuery: [Load and query data with the Google Cloud console](https://cloud.google.com/bigquery/docs/quickstarts/load-data-console).  You will also need to setup Google Cloud Storage to have a bucket to upload the raw data to.
 
 ### Downloading Example Data
 
