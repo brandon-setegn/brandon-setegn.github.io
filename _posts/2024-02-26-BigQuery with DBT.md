@@ -15,7 +15,7 @@ The shift to cloud computing has also led to a reimangined data stack.  Data war
 Included below is an example of how to load data into BigQuery and transform it with DBT.  [Historical Loan Performance data for the CAS deals from Fannie Mae](https://capitalmarkets.fanniemae.com/credit-risk-transfer/single-family-credit-risk-transfer/connecticut-avenue-securities) will be used.  It will be loaded into BigQuery in its raw form and transformed with SQL generated from DBT to make it usable.
 
 ## Source Code
-> Code for this post can be found on [GitHub: DBT Project](https://github.com/brandon-setegn/loan-performance-dbt/tree/master/dbt-project)
+> DBT Code for this post can be found on [GitHub: DBT Project](https://github.com/brandon-setegn/loan-performance-dbt/tree/master/dbt-project)
 
 ## Google BigQuery
 ### Prerequisites
@@ -232,3 +232,6 @@ _DBT Lineage_
 What is the point of all this hard work if we can't show it off?  A quick and easy way to show some performance charts is with Plotly Dash.  Here is an example built with Plotly Dash and hosted in GCP Cloud Run.  Hopefully, they'll be time for a post about it soon 🤞.
 
 [Plotly Dash Hosted in Cloud Run](https://loan-performance-dash-bbzw5i4wwa-ue.a.run.app/)
+
+## Source Code - Plotly Dash
+> Code for the Plotly Dashboard can be found on [GitHub: Loan Performance Dash](https://github.com/brandon-setegn/loan-performance-dash)
