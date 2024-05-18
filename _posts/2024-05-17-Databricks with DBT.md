@@ -62,6 +62,7 @@ If it fails, try double checking your Azure settings and key.
 dbutils.fs.ls(base_path)
 ```
 
+#### Use PySpark to Load Our Table
 Next, we create our schema similiar to how we did when loading BigQuery.  However, this time we will use PySpark.
 To view the whole schema, checkout the file in my Github Repo: [example-schema.py](https://github.com/brandon-setegn/loan-performance-dbt/blob/master/loanperf_databricks/example-schema.py).
 ```python
@@ -89,4 +90,59 @@ Now, we can save our table to the Unity Catalog of our choice.  This will allow 
 df.write.saveAsTable(f"{catalog}.{schema}.cas_deals")
 ```
 
+#### Verify Results in SQL Editor
+Once the table is saved to the Unity Catalog using PySpark, it can be easily queried using the Databricks SQL Editor. This tool provides a user-friendly interface for running SQL queries on your data.  The SQL Editor allows us to quickly check the structure and contents of the table, ensuring that our data has been loaded and transformed correctly.
 
+```sql
+SELECT * FROM catalog.schema.cas_deals LIMIT 10;
+```
+
+![SQL Editor Results](/assets/img/databricks-dbt-sql-editor.png){: width="513" height="352" }
+_Bronze Table SQL Editor Results_
+
+## DBT
+Now that our Bronze table is loaded, we can use DBT to make the transformations we need to create our Silver, and Gold tables.
+
+This post will only cover the changes need to modify the existing BigQuery DBT project to Databricks.
+
+### Source Code
+[LoanPerf - Databricks Github](https://github.com/brandon-setegn/loan-performance-dbt/tree/master/loanperf_databricks)
+
+### Connecting to Databricks
+You will need to be running a SQL Warehouse in Databricks to be able to connect.  Follow the instructions from the DBT Databricks repo for connecting your local environment to Databricks.  Ensure you're connected to Databricks from your DBT environment before proceeding: [DBT - Databricks Connecting](https://github.com/databricks/dbt-databricks/blob/main/docs/local-dev.md)
+
+Make sure to check the `Connection Details` of your Databricks SQL Warehouse when setting up your DBT Profile.
+
+![Gold SQL Editor Results](/assets/img/databricks-dbt-warehouse-connection-details.png){: width="484" height="255" }
+_Gold Table SQL Editor Results_
+
+
+
+### Code Changes from BigQuery
+A few small code changes were needed to make the same SQL run on Databricks.  This highlights the fact that while DBT code is very portable, because its mostly just SQL, some small changes can be required between database types.
+
+```sql
+-- BigQuery
+PARSE_DATE('%m%Y', monthly_reporting_period) AS reporting_period
+
+-- Databricks Spark SQL
+TO_DATE(monthly_reporting_period, 'MMyyyy') AS reporting_period
+```
+
+```sql
+-- BigQuery
+countif(scheduled_ending_balance > 0) as active_loan_count
+
+-- Databricks Spark SQL
+ COUNT(CASE WHEN scheduled_ending_balance > 0 THEN 1 END) as active_loan_count,
+```
+
+#### DBT Run
+Now that our SQL is updated, we can run [dbt run](https://docs.getdbt.com/reference/commands/run) to update the definitions in our data warehouse.
+> `dbt run` will create the defined tables, views, and other objects in our data warehouse
+
+## Final Results
+If `dbt run` was successful we can view our final materialized performance table in the Databricks SQL Editor.  This demonstrates that it is more than possible to move your DBT code between data warehouses.  Using DBT may be a great way to prevent vendor lockin for some of your data workflows.
+
+![Gold SQL Editor Results](/assets/img/databricks-dbt-sql-editor-perf.png){: width="513" height="352" }
+_Gold Table SQL Editor Results_
