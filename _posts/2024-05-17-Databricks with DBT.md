@@ -8,20 +8,22 @@ image:
   path: /assets/img/databricks-dbt.png
 ---
 
-In my previous post, [Bigquery with DBT](/posts/BigQuery-with-DBT/), we saw the power of using DBT with Google BigQuery to perform our data transformations.  But BigQuery is just one of many big data solutions currently available.  Databricks is a another highly popular big data solution that offers a powerful data warehousing toolset. It provides a unified analytics platform that combines data engineering, data science, and business analytics, making it a versatile choice for data-driven organizations.
+In my previous post, [Bigquery with DBT](/posts/BigQuery-with-DBT/), we saw the power of using DBT ([Data Build Tool](https://www.getdbt.com/)) with Google BigQuery to perform our data transformations.  But BigQuery is just one of many big data solutions currently available.  Databricks is a another highly popular platform that offers a powerful data warehousing toolset. It provides a unified analytics platform that combines data engineering, data science, and business analytics, making it a versatile choice for data-driven organizations.
 
-Databricks SQL allows us to interact with our data with ordinary SQL (ANSI SQL) meaning we can use DBT to perform our transformations.  Databricks has many different tools for building your data pipeline.  While DBT may not be your first choice in the Databricks ecosystem it is still viable option.  This will also help example us compare Databricks with BigQuery which is important when deciding which cloud data warehouse to choose.
+Databricks SQL allows us to interact with our data with [SQL](https://docs.databricks.com/en/sql/language-manual/index.html), meaning we can use DBT to perform our transformations.  Databricks has many different tools for building your data pipeline.  While DBT may not be the first solution that comes to mind in Databricks, it is still an excellent option.  This post will also help example us compare Databricks SQL Warehouse with BigQuery, which is important when deciding which cloud data warehouse to choose.
 
 ## Setup
 
-I will only briefly go over some of the steps required to setup the sample data in Databricks for this example.  I used the same data as the BigQuery with DBT post and simply moved it over to Azure Blob Storage.  To obtain the CSV used in this example, follow the instructions in the previous post: [Steps to Download Data](/posts/BigQuery-with-DBT/#downloading-example-data).
+I will only briefly go over some of the steps required to setup the sample data in Databricks for this example.  I used the same data as the [Bigquery with DBT](/posts/BigQuery-with-DBT/) post and simply moved it over to Azure Blob Storage.  To obtain the CSV used in this example, follow the instructions in the previous post: [Steps to Download Data](/posts/BigQuery-with-DBT/#downloading-example-data).
 
-### Cloud Costs
-> Databricks is very expensive!  If you do spin up your own Databricks watch your costs very closely.  Make sure to set your clusters to `auto stop` after 30 minutes.  Also, set budget alerts to make sure you're not spending more than you think.
-{: .prompt-danger }
+### Prerequisites
+You will need a full version of Databricks running in a cloud platform.  I chose the the [Premium plan](https://www.databricks.com/product/pricing/databricks-sql) so that I could test their SQL Serverless warehouse.  The community version does not give you a SQL Warehouse to connect your DBT project to.  The cheapest Serverless SQL Warehouse option for this costs $2.80 an hour.  However, it can spin up in 5-10 seconds.  This allows us to turn off the Warehouse quickly when its not in use with no long cluster startup times.
 
+#### Cloud Costs
 I used Azure Databricks, taking advantage of the free trial for both both Azure and Databricks separately.  I was able to keep costs well within the $200 trial amount for Azure.  The Databricks trial is only 14 days and they give you very little insight into how much you are spending.  Make sure to cancel the trial before you are charged.
 
+> Databricks is very expensive!  If you do spin up your own Databricks watch your costs very closely.  Make sure to set your clusters to `auto stop` after 30 minutes.  Also, set budget alerts to make sure you're not spending more than you think.
+{: .prompt-danger }
 
 ### Creating our Bronze Table
 Once the data is uploaded to Azure Blob Storage we can access it from Databricks.  There are many different ways to load your data into Databricks.  I chose to connect directly to Azure from Databricks Spark as this was the simplest at the time.  It took several minutes to load the data and is most likely not the most performant option.  
