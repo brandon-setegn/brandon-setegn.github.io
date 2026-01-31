@@ -5,12 +5,14 @@ categories: [kafka, streaming, python, openspec]
 mermaid: true
 tags: [openspec, spec-driven development, kafka, python, streaming, data engineering]
 image:
-  path: /assets/img/kafka-streams-confluent.png
+  path: /assets/img/openspec-header.png
 ---
-OpenSpec is a lightweight approach to spec-driven development that treats a single, unified specification as the source of truth for a system. By defining intent before implementation, it improves clarity, strengthens traceability from requirements to code, and helps keep humans and AI assistants aligned throughout the development process.
+
+When I originally started on this post I thought it was just going to be about Kafka and how to get started with it.  But over the last few weeks I started to do to more _spec-driven development_, mainly with OpenSpec.  Having seen the how incredibly powerful spec-driven can be, I had to pivot to this new topic.
+
 [OpenSpec](https://intent-driven.dev/knowledge/openspec/) is a lightweight  approach to spec-driven development that treats a single, unified specification as the source of truth for a system. By defining intent before implementation, it improves clarity, strengthens traceability from requirements to code, and helps keep humans and AI assistants aligned throughout the development process.
 
-In this post we'll use OpenSpec to drive a small project: a local [Apache Kafka](https://kafka.apache.org/) producer and consumer in Python.  The code still demonstrates Kafka and the [Confluent Python client](https://docs.confluent.io/kafka-clients/python/current/overview.html).  The focus here is on how OpenSpec shapes the work and the benefits you get from it.
+In this post we'll use OpenSpec to drive a small project: a local [Apache Kafka](https://kafka.apache.org/) producer and consumer in Python.  The code will demonstrate how to stand up a local Kafka server and connect with a [Confluent Python client](https://docs.confluent.io/kafka-clients/python/current/overview.html).  The focus here is on how OpenSpec shapes the work and the benefits you get from it.
 
 > 💡**OpenSpec keeps a living spec as the source of truth.  Instead of scattering design across tickets and wikis, you maintain specs and changes that evolve with the codebase—improving clarity, traceability, and alignment with AI assistants.**
 
@@ -20,7 +22,7 @@ In this post we'll use OpenSpec to drive a small project: a local [Apache Kafka]
 
 ## What is OpenSpec?
 
-OpenSpec treats **specifications as the source of truth**.  Instead of scattering design across tickets, wikis, and ad-hoc docs, you maintain a living spec that evolves with the codebase.  The workflow is **propose → design → implement → archive**: you capture *what* should change and *why*, then implement, then archive the change so you have an audit trail.
+[OpenSpec](https://github.com/Fission-AI/OpenSpec) treats **specifications as the source of truth**.  Instead of scattering design across tickets, wikis, and ad-hoc docs, you maintain a living spec that evolves with the codebase.  The workflow is **propose → design → implement → archive**: you capture *what* should change and *why*, then implement, then archive the change so you have an audit trail.
 
 Two folders structure the work:
 
