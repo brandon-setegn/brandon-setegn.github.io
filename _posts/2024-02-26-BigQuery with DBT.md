@@ -3,7 +3,7 @@ title:  "Data Transformations with BigQuery and DBT"
 date:   2024-02-26 20:00:00 -0500
 categories: [data warehouse, bigquery, dbt]
 mermaid: true
-tags: [dbt, bigquery, GCP]
+tags: [dbt, bigquery, gcp]
 image:
   path: /assets/img/bigquery-dbt.png
 ---

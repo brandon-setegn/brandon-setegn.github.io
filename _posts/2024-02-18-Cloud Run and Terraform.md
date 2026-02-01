@@ -3,7 +3,7 @@ title:  "Deploying to Cloud Run with Terraform"
 date:   2024-02-18 20:00:00 -0500
 categories: [terraform, cloud run]
 mermaid: true
-tags: [scala, play framework, GCP, terraform, cloud run]
+tags: [scala, play framework, gcp, terraform, cloud run]
 image:
   path: /assets/img/CloudRunTerraform.png
 ---
