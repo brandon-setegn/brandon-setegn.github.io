@@ -1,85 +1,146 @@
 ---
-title:  "Spec-Driven Development with OpenSpec: A Kafka Example"
-date:   2025-01-31 20:00:00 -0500
+title: "Spec-Driven Development with OpenSpec: A Kafka Example"
+date:  2025-01-31 20:00:00 -0500
 categories: [openspec, kafka, streaming, python]
 mermaid: true
 tags: [openspec, spec-driven development, kafka, python, streaming, ai]
 image:
-  path: /assets/img/openspec-header.png
+ path: /assets/img/openspec-header.png
 ---
 
-When I originally started working on this post I thought it was going to be about Kafka and how to get started with it.  But over the last few weeks I started to do to more _spec-driven development_, mainly with OpenSpec.  Having seen how powerful this workflow can be and how it enables you to fully utilize AI coding, I pivoted to this topic.
+When I originally started working on this post I thought it was going to be about Kafka and how to get started with it. But over the last few weeks I started to do to more _spec-driven development_, mainly with [OpenSpec](https://github.com/Fission-AI/OpenSpec). Having seen how powerful this workflow can be and how it enables you to fully utilize AI coding, I pivoted to this topic.
 
-[OpenSpec](https://intent-driven.dev/knowledge/openspec/) is a lightweight approach to spec-driven development that treats a single, unified specification as the source of truth for a system. By defining **intent before implementation**, it improves clarity, strengthens traceability from requirements to code, and helps keep humans and AI assistants aligned throughout the development process.
-
-In this post we use OpenSpec to drive a small project: a local [Apache Kafka](https://kafka.apache.org/) producer and consumer in Python.  The code shows how to stand up a local Kafka server and connect with a [Confluent Python client](https://docs.confluent.io/kafka-clients/python/current/overview.html).  The focus here is on how OpenSpec shapes the work and the benefits you get from it.
-
-> 💡**OpenSpec keeps a living spec as the source of truth.  Instead of scattering design across tickets and wikis, you maintain specs and changes that evolve with the codebase—improving clarity, traceability, and alignment with AI assistants.**
+In this post we use [OpenSpec](https://github.com/Fission-AI/OpenSpec) to drive a small project: a local [Apache Kafka](https://kafka.apache.org/) producer and consumer in Python. The code shows how to stand up a local Kafka server and connect with a [Confluent Python client](https://docs.confluent.io/kafka-clients/python/current/overview.html). The focus here is on how OpenSpec shapes the work and the benefits you get from it.
 
 ## Source Code
 
-> The example project is available on GitHub: [kafka-test](https://github.com/brandon-setegn/kafka-test).  All code blocks labeled "From the example" below are sourced from that repo.
+> The example project is available on GitHub: [kafka-test](https://github.com/brandon-setegn/kafka-test). All code blocks labeled "From the example" below are sourced from that repo.
 
-## What is OpenSpec?
+# Spec-driven Development
+**Spec-driven development** is the practice of writing detailed specifications before—and during—implementation, treating those specs as the source of truth for your project's design and architecture. 
 
-[OpenSpec](https://github.com/Fission-AI/OpenSpec) treats **specifications as the source of truth**.  Instead of scattering design across tickets, wikis, and ad-hoc docs, you maintain a living spec that evolves with the codebase.  The workflow is **propose → design → implement → archive**: you capture *what* should change and *why*, then implement, then archive the change so you have an audit trail.
+> 💡**When working with AI coding assistants, maintaining comprehensive specs in your repository ensures the AI's context window is filled with what matters most: your project's goals, constraints, and design decisions.**
 
-Two folders structure the work:
+Rather than the AI inferring intent from scattered code comments or incomplete documentation, it can reference your living specifications to understand *why* the system works the way it does and *how* new changes should align with existing architecture. This fundamentally changes how effectively AI assistants can contribute to your codebase—they're no longer just pattern-matching on code, they're reasoning from your documented intent.
 
-- `specs/` — The current state of the system.  Each spec describes a capability (e.g. local Kafka, Python clients) with requirements and scenarios in a consistent format.
-- `changes/` — Proposed deltas.  A change typically has a proposal (why and what), a design (decisions and trade-offs), and a task list.  When done, the change is archived so the history is preserved.
+# What is OpenSpec?
+
+[OpenSpec](https://github.com/Fission-AI/OpenSpec) is a lightweight framework that gives you **prompts** and **skills** to be used with AI coding assistants. It treats **specifications as the source of truth**: by storing design specs directly in your project's repository, they remain accessible for future modifications. Once the OpenSpec CLI adds these skill files to your project, the tool is no longer required for day-to-day use. You may need it later to update your skills, but there is no long-term tie-in. If you ever move on, you can migrate by taking your spec documents to another format.
+
+## Setup
+
+### Installing OpenSpec
+
+The quickest way to install OpenSpec CLI is via `npm`:
+```bash
+npm install -g @fission-ai/openspec
+```
+
+> There are other installation methods available—check the [OpenSpec documentation](https://github.com/Fission-AI/OpenSpec/blob/main/docs/installation.md) for alternatives.
+
+### Initializing Your Project
+
+Once installed, navigate to your project directory and run the initialization command:
+```bash
+openspec init
+```
+
+This creates the necessary directory structure and starter files for your specs and skills.
+
+![OpenSpec Init 1](/assets/img/openspec-cli-1.png){: width="377" height="263" }
+
+![OpenSpec Init 1](/assets/img/openspec-cli-2.png){: width="592" height="401" }
+_OpenSpec Init Options_
+
+For my selected IDE _Cursor_, the `init` command set up these folders with markdown files. These files add skills, which are just improved prompts, to be used by the AI assistant.
+
+![OpenSpec Init 1](/assets/img/openspec-skills-folders.png){: width="306" height="475" }
+_OpenSpec Skills Mardown Files_
+
+These new skills are available to use in the chat window or command line with your AI assistant. Your tool should add these to autocomplete when using `/` or have a skills menu in the CLI.
+
+![OpenSpec Init 1](/assets/img/openspec-skills-usage.png){: width="606" height="457" }
+_OpenSpec Skills in Chat Window_
+
+## OpenSpec Workflow
+
+As you move through the workflow (proposal → specs → design → tasks → implement → verify → archive), you are also **filling the context window** with the right content. The assistant sees the proposal, the specs, the design, and the task list. That context is critical. It keeps the model aligned with intent and reduces drift, so implementation stays on target and the code you get is better.
+
+```mermaid
+flowchart TB
+ newChange["/openspec-new-change"]
+ createArtifacts["Create artifacts: proposal, specs, design, tasks"]
+ applyCmd["/openspec-apply-change"]
+ verifyCmd["/openspec-verify-change (optional)"]
+ archiveCmd["/openspec-archive-change"]
+ mergeSpecs["/Change specs merge into main specs"]
+ newChange --> createArtifacts
+ createArtifacts --> applyCmd
+ applyCmd --> verifyCmd
+ verifyCmd --> archiveCmd
+ archiveCmd --> mergeSpecs
+```
+
+### Creating Your First Change
+The first change created for this project was `add-docker-compose-kafka`. To do this we simply use the skill `/openspec-new-change` as follows.
+
+```text
+/openspec-new-change add-docker-compose-kafka
+```
+
+We haven't had to add any real context yet as all this has done is setup our folder structure.  You should now see the `openspec/changes/add-docker-compose-kafka` folder with a `.openspec.yaml` with little else.
+
+
+#### Folder Structure
+There are
+- `specs/` — The ***current specs*** documenting the state of the system. Each spec describes a capability (e.g. local Kafka, Python clients) with requirements and scenarios in a consistent format.
+- `changes/` — ***Proposed deltas***. A change typically has a proposal (why and what), a design (decisions and trade-offs), and a task list. When done, the change is archived so the history is preserved.
+  - `changes/archive/` — This is where the files created for proposed deltas go after they have been completed.
+
+
+#### Creating the Change Files
+So next, we will  create
+- `specs/` — The ***current specs*** documenting the state of the system. Each spec describes a capability (e.g. local Kafka, Python clients) with requirements and scenarios in a consistent format.
+- `changes/` — ***Proposed deltas***. A change typically has a proposal (why and what), a design (decisions and trade-offs), and a task list. When done, the change is archived so the history is preserved.
+  - `changes/archive/` — This is where the files created for proposed deltas go after they have been completed.
+
+```text
+/openspec-new-change add-docker-compose-kafka
+```
 
 Benefits:
 
 - **Clarity before coding** — You spell out requirements and scenarios up front, so implementation has a clear target.
 - **Traceability** — You can trace from a scenario in a spec to the code that fulfills it, and from a task list to the files that were added or changed.
 - **Better alignment** — Humans and AI assistants share the same reference (the specs and change docs), which reduces drift between intent and code.
-- **Lighter than heavy design docs** — OpenSpec aims for enough structure to guide work without drowning in process.  It works with Cursor, Claude Code, and other AI coding tools.
+- **Lighter than heavy design docs** — OpenSpec aims for enough structure to guide work without drowning in process. It works with Cursor, Claude Code, and other AI coding tools.
 
-No code lives in the specs themselves.  They describe *what* the system shall do.  The code lives in the repo and is tied to the spec via the change workflow.
+No code lives in the specs themselves. They describe *what* the system shall do. The code lives in the repo and is tied to the spec via the change workflow.
 
-## OpenSpec Workflow
 
-Using the OpenSpec workflow properly leads to better code.  You agree on intent and structure before implementation, so the assistant has a clear target and you get traceable, reviewable changes.  The flow is **fluid** (actions, not locked phases).  You use **OPSX** slash commands such as `/opsx:new`, `/opsx:ff`, `/opsx:apply`, and `/opsx:archive`.  For patterns and when to use each, see the [OpenSpec site](https://openspec.dev/) and [Workflows doc](https://github.com/Fission-AI/OpenSpec/blob/main/docs/workflows.md).
+Using the OpenSpec workflow properly leads to better code. You agree on intent and structure before implementation, so the assistant has a clear target and you get traceable, reviewable changes. The flow is **fluid** (actions, not locked phases). You use **OPSX** slash commands such as `/opsx:new`, `/opsx:ff`, `/opsx:apply`, and `/opsx:archive`. For patterns and when to use each, see the [OpenSpec site](https://openspec.dev/) and [Workflows doc](https://github.com/Fission-AI/OpenSpec/blob/main/docs/workflows.md).
 
-Run `openspec init` in a project to set up OpenSpec.  The CLI creates the `openspec/` folder (specs, changes, config) and installs integration for your chosen AI coding tool so slash commands and workflow guidance are available in chat.  During init you select which tool(s) to support.  The result is **skills** that teach the assistant how to run the OpenSpec workflow.  A skill is a persistent instruction set stored in the project (multiple steps, slash commands, artifacts) that gives the assistant consistent behavior across chat sessions.
+Run `openspec init` in a project to set up OpenSpec. The CLI creates the `openspec/` folder (specs, changes, config) and installs integration for your chosen AI coding tool so slash commands and workflow guidance are available in chat. During init you select which tool(s) to support. The result is **skills** that teach the assistant how to run the OpenSpec workflow. A skill is a persistent instruction set stored in the project (multiple steps, slash commands, artifacts) that gives the assistant consistent behavior across chat sessions.
 
-**Specs** live in `openspec/specs/` and are the source of truth for how the system currently behaves.  **Changes** live in `openspec/changes/<change-name>/`.  Each change has artifacts (proposal, design, tasks) and its own specs folder that describes what is being added or modified.  When you archive the change, those specs merge into `openspec/specs/`, which become the updated source of truth.
+**Specs** live in `openspec/specs/` and are the source of truth for how the system currently behaves. **Changes** live in `openspec/changes/<change-name>/`. Each change has artifacts (proposal, design, tasks) and its own specs folder that describes what is being added or modified. When you archive the change, those specs merge into `openspec/specs/`, which become the updated source of truth.
 
-As you move through the workflow (proposal → specs → design → tasks → implement → verify → archive), you are also **filling the context window** with the right content.  The assistant sees the proposal, the specs, the design, and the task list.  That context is critical.  It keeps the model aligned with intent and reduces drift, so implementation stays on target and the code you get is better.
-
-```mermaid
-flowchart TB
-  newChange["/opsx:new"]
-  createArtifacts["Create artifacts: proposal, specs, design, tasks"]
-  applyCmd["/opsx:apply"]
-  verifyCmd["/opsx:verify optional"]
-  archiveCmd["/opsx:archive"]
-  mergeSpecs["Change specs merge into main specs"]
-
-  newChange --> createArtifacts
-  createArtifacts --> applyCmd
-  applyCmd --> verifyCmd
-  verifyCmd --> archiveCmd
-  archiveCmd --> mergeSpecs
-```
 
 We will see this workflow in practice when we walk through a concrete change in the kafka-test project.
 
 ## Project Overview: kafka-test
 
-The example project (kafka-test) exists to support **local Kafka experimentation and learning**, and it was built using OpenSpec.  Clone it from [kafka-test](https://github.com/brandon-setegn/kafka-test).
+The example project (kafka-test) exists to support **local Kafka experimentation and learning**, and it was built using OpenSpec. Clone it from [kafka-test](https://github.com/brandon-setegn/kafka-test).
 
 High-level structure (from the example):
 
 - **Root:** `producer.py`, `consumer.py`, `docker-compose.yml`, `requirements.txt`, `.env.example`, `README.md`
 - **openspec/:** `project.md`, `specs/` (current capabilities), `changes/archive/` (completed changes)
 
-The project runs a Kafka broker locally via Docker Compose and provides Python producer and consumer clients that send and receive JSON messages.  There is no Confluent Cloud or Schema Registry in this example—everything runs against a local broker.
+The project runs a Kafka broker locally via Docker Compose and provides Python producer and consumer clients that send and receive JSON messages. There is no Confluent Cloud or Schema Registry in this example—everything runs against a local broker.
 
 ## OpenSpec in Action
 
-The following sections use only artifacts from the kafka-test repo.  Each is labeled so you know it comes from that repo.
+The following sections use only artifacts from the kafka-test repo. Each is labeled so you know it comes from that repo.
 
 ### Project context (kafka-test: openspec/project.md)
 
@@ -91,11 +152,11 @@ Purpose: a testing and experimentation project for Apache Kafka—producer/consu
 
 ### Specs as requirements
 
-Specs are written as requirements with **WHEN/THEN/AND** scenarios.  Two specs in the example describe the current system.
+Specs are written as requirements with **WHEN/THEN/AND** scenarios. Two specs in the example describe the current system.
 
 **From the example** (kafka-test: `openspec/specs/local-kafka/spec.md`):
 
-The **Local Kafka** spec says the project SHALL provide a Docker Compose configuration to run a Kafka broker locally.  Example scenarios:
+The **Local Kafka** spec says the project SHALL provide a Docker Compose configuration to run a Kafka broker locally. Example scenarios:
 
 - **Start local Kafka:** WHEN a developer runs `docker-compose up` THEN Zookeeper and Kafka start, Kafka is accessible on port 9092, and services are healthy.
 - **Stop:** WHEN a developer runs `docker-compose down` THEN services stop and containers are removed.
@@ -104,21 +165,21 @@ The **Local Kafka** spec says the project SHALL provide a Docker Compose configu
 
 **From the example** (kafka-test: `openspec/specs/python-kafka-clients/spec.md`):
 
-The **Python Kafka Clients** spec says the project SHALL provide a Python producer and consumer for the local broker, with dependency management and JSON serialization.  It includes scenarios such as: producer connects to localhost:9092 and sends messages to a topic with delivery confirmation, producer serializes Python dicts to JSON, consumer connects and subscribes and reads messages and deserializes JSON and uses a consumer group, and both raise appropriate errors when the broker is unreachable.  Another requirement: `pip install -r requirements.txt` installs the needed packages (e.g. confluent-kafka), and Python 3.8+ is supported.
+The **Python Kafka Clients** spec says the project SHALL provide a Python producer and consumer for the local broker, with dependency management and JSON serialization. It includes scenarios such as: producer connects to localhost:9092 and sends messages to a topic with delivery confirmation, producer serializes Python dicts to JSON, consumer connects and subscribes and reads messages and deserializes JSON and uses a consumer group, and both raise appropriate errors when the broker is unreachable. Another requirement: `pip install -r requirements.txt` installs the needed packages (e.g. confluent-kafka), and Python 3.8+ is supported.
 
 ### A change from idea to code
 
-The Python clients were added via a single change.  Here we walk through that change using only the example’s archived artifacts.
+The Python clients were added via a single change. Here we walk through that change using only the example’s archived artifacts.
 
 **Proposal** (kafka-test: `openspec/changes/archive/2026-01-30-add-python-kafka-clients/proposal.md`):
 
 - **Why:** Enable programmatic interaction with the local Kafka broker for testing, experimentation, and development. Python is popular and has good library support.
 - **What changes:** Python project structure and `requirements.txt`, a Kafka producer client and a consumer client, example usage and docs, and configuration to use localhost:9092.
-- **Impact:** New spec `python-kafka-clients`, new files `producer.py`, `consumer.py`, `requirements.txt`, and dependencies Python 3.x and a Kafka client library (e.g. confluent-kafka).  No breaking changes.
+- **Impact:** New spec `python-kafka-clients`, new files `producer.py`, `consumer.py`, `requirements.txt`, and dependencies Python 3.x and a Kafka client library (e.g. confluent-kafka). No breaking changes.
 
 **Design** (kafka-test: `openspec/changes/archive/2026-01-30-add-python-kafka-clients/design.md`):
 
-- **Library:** Use `confluent-kafka` (performance, documentation, maintenance).  Alternatives considered were kafka-python and aiokafka.
+- **Library:** Use `confluent-kafka` (performance, documentation, maintenance). Alternatives considered were kafka-python and aiokafka.
 - **Serialization:** JSON for simplicity and readability.
 - **Layout:** Separate `producer.py` and `consumer.py` for clear separation of concerns.
 - **Configuration:** Environment variables or hardcoded defaults (localhost:9092) to match Docker Compose.
@@ -126,40 +187,40 @@ The Python clients were added via a single change.  Here we walk through that ch
 
 **Tasks** (kafka-test: `openspec/changes/archive/2026-01-30-add-python-kafka-clients/tasks.md`):
 
-The task list maps directly to what was implemented: project setup (requirements.txt, Python version, README venv instructions), producer implementation (producer.py with create_producer, produce_message, JSON serialization, localhost:9092, error handling, `if __name__ == '__main__'`), consumer implementation (consumer.py with create_consumer, consume_messages, JSON deserialization, consumer group, error handling, main block), documentation (README setup, usage, prerequisites), and validation (connect, produce, consume, end-to-end, error when broker down).  Each of these tasks corresponds to the code and docs you see in kafka-test.
+The task list maps directly to what was implemented: project setup (requirements.txt, Python version, README venv instructions), producer implementation (producer.py with create_producer, produce_message, JSON serialization, localhost:9092, error handling, `if __name__ == '__main__'`), consumer implementation (consumer.py with create_consumer, consume_messages, JSON deserialization, consumer group, error handling, main block), documentation (README setup, usage, prerequisites), and validation (connect, produce, consume, end-to-end, error when broker down). Each of these tasks corresponds to the code and docs you see in kafka-test.
 
 ## Code from the Example
 
-> The following snippets are from the [kafka-test](https://github.com/brandon-setegn/kafka-test) repo.  Full files and configuration are there.
+> The following snippets are from the [kafka-test](https://github.com/brandon-setegn/kafka-test) repo. Full files and configuration are there.
 {: .prompt-info }
 
 The snippets below highlight the concepts: how the producer is created and sends serialized messages, and how the consumer reads and deserializes them.
 
 ### Producer: creation and sending (kafka-test: producer.py)
 
-The producer is created with the Confluent client and a config dict.  You then serialize messages and call `produce`, then `poll` and `flush` to wait for delivery.
+The producer is created with the Confluent client and a config dict. You then serialize messages and call `produce`, then `poll` and `flush` to wait for delivery.
 
 **From the example** (kafka-test: `producer.py`) — creating the producer:
 
 ```python
-    config = {
-        'bootstrap.servers': bootstrap_servers,
-    }
-    ...
-    producer = Producer(config)
-    return producer
+  config = {
+    'bootstrap.servers': bootstrap_servers,
+  }
+  ...
+  producer = Producer(config)
+  return producer
 ```
 
 **From the example** (kafka-test: `producer.py`) — serializing and sending a message:
 
 ```python
-        if isinstance(value, dict) or not isinstance(value, (str, bytes)):
-            value_json = json.dumps(value)
-            value_bytes = value_json.encode('utf-8')
-        ...
-        producer.produce(topic, value=value_bytes, key=key_bytes, callback=delivery_callback)
-        producer.poll(0)
-        producer.flush()
+    if isinstance(value, dict) or not isinstance(value, (str, bytes)):
+      value_json = json.dumps(value)
+      value_bytes = value_json.encode('utf-8')
+    ...
+    producer.produce(topic, value=value_bytes, key=key_bytes, callback=delivery_callback)
+    producer.poll(0)
+    producer.flush()
 ```
 
 The client calls your `delivery_callback(err, msg)` when each message is delivered or fails, so you can confirm or handle errors.
@@ -171,19 +232,19 @@ The consumer subscribes to topics, polls in a loop, and deserializes each messag
 **From the example** (kafka-test: `consumer.py`) — subscribe, poll, and deserialize:
 
 ```python
-            msg = consumer.poll(timeout=timeout)
-            ...
-            value_str = msg_value.decode('utf-8')
-            value_dict = json.loads(value_str)
-            ...
-            yield (msg.topic(), msg.partition(), msg.offset(), timestamp_ms, value_dict)
+      msg = consumer.poll(timeout=timeout)
+      ...
+      value_str = msg_value.decode('utf-8')
+      value_dict = json.loads(value_str)
+      ...
+      yield (msg.topic(), msg.partition(), msg.offset(), timestamp_ms, value_dict)
 ```
 
-So the flow is: subscribe once, then repeatedly poll.  For each message, decode the value from UTF-8 and parse JSON to get a dict your code can use.
+So the flow is: subscribe once, then repeatedly poll. For each message, decode the value from UTF-8 and parse JSON to get a dict your code can use.
 
 ## Prerequisites and Running the Example
 
-> You do **not** need a Confluent Cloud account.  Everything in this example runs against a local broker.
+> You do **not** need a Confluent Cloud account. Everything in this example runs against a local broker.
 {: .prompt-info }
 
 You need:
@@ -193,24 +254,24 @@ You need:
 
 Steps (aligned with the example’s README):
 
-1. **Start Kafka:** From the project directory after cloning kafka-test, run `docker-compose up -d`.  The broker will be at `localhost:9092`.
+1. **Start Kafka:** From the project directory after cloning kafka-test, run `docker-compose up -d`. The broker will be at `localhost:9092`.
 2. **Python setup:** Create a venv if you like, then `pip install -r requirements.txt`.
-3. **Produce:** Run `python producer.py`.  It sends a JSON message to the default topic (`test-topic` unless `KAFKA_TOPIC` is set).
-4. **Consume:** In another terminal, run `python consumer.py`.  It subscribes to the same topic, consumes up to 10 messages (per the example’s main), and prints them with partition, offset, and timestamp.
+3. **Produce:** Run `python producer.py`. It sends a JSON message to the default topic (`test-topic` unless `KAFKA_TOPIC` is set).
+4. **Consume:** In another terminal, run `python consumer.py`. It subscribes to the same topic, consumes up to 10 messages (per the example’s main), and prints them with partition, offset, and timestamp.
 
 Optional: copy `.env.example` to `.env` and set `ZOOKEEPER_PORT` or `KAFKA_PORT` if you need different ports.
 
 ## Wrapping Up
 
-This post focused on **OpenSpec** and how it drives a small Kafka example.  The specs gave a single source of truth for what “local Kafka” and “Python clients” mean.  The change (proposal, design, tasks) made the path from idea to code explicit and traceable, and the archived change keeps an audit trail.  The implementation still shows Kafka and the Confluent Python client in action—producing and consuming JSON on a local broker—but the narrative emphasized how the OpenSpec workflow leads to better code through clarity, traceability, and alignment.
+This post focused on **OpenSpec** and how it drives a small Kafka example. The specs gave a single source of truth for what “local Kafka” and “Python clients” mean. The change (proposal, design, tasks) made the path from idea to code explicit and traceable, and the archived change keeps an audit trail. The implementation still shows Kafka and the Confluent Python client in action—producing and consuming JSON on a local broker—but the narrative emphasized how the OpenSpec workflow leads to better code through clarity, traceability, and alignment.
 
 Key takeaways:
 
 - Using the OpenSpec workflow lets you fully utilize agentic AI tools.
 - OpenSpec keeps specs as the source of truth and uses a fluid workflow (proposal → specs → design → tasks → implement → archive).
 - The two-folder layout (specs/ and changes/) keeps current state and proposed work clear.
-- The kafka-test repo was built with OpenSpec.  All code labeled “From the example” is sourced from that repo.
-- You can run the example locally with Docker Compose and Python.  No cloud account is required.
+- The kafka-test repo was built with OpenSpec. All code labeled “From the example” is sourced from that repo.
+- You can run the example locally with Docker Compose and Python. No cloud account is required.
 
 ## Next Steps
 
