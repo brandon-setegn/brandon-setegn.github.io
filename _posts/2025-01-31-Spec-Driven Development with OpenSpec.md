@@ -1,16 +1,16 @@
 ---
 title:  "Spec-Driven Development with OpenSpec: A Kafka Example"
-date:   2025-01-15 20:00:00 -0500
-categories: [kafka, streaming, python, openspec]
+date:   2025-01-31 20:00:00 -0500
+categories: [openspec, kafka, streaming, python]
 mermaid: true
-tags: [openspec, spec-driven development, kafka, python, streaming, data engineering]
+tags: [openspec, spec-driven development, kafka, python, streaming, ai]
 image:
   path: /assets/img/openspec-header.png
 ---
 
-When I originally started on this post I thought it was just going to be about Kafka and how to get started with it.  But over the last few weeks I started to do to more _spec-driven development_, mainly with OpenSpec.  Having seen the how incredibly powerful spec-driven can be, I had to pivot to this new topic.
+When I originally started working on this post I thought it was going to be about Kafka and how to get started with it.  But over the last few weeks I started to do to more _spec-driven development_, mainly with OpenSpec.  Having seen the how incredibly powerful spec-driven can be, I had to pivot to this new topic.
 
-[OpenSpec](https://intent-driven.dev/knowledge/openspec/) is a lightweight  approach to spec-driven development that treats a single, unified specification as the source of truth for a system. By defining intent before implementation, it improves clarity, strengthens traceability from requirements to code, and helps keep humans and AI assistants aligned throughout the development process.
+[OpenSpec](https://intent-driven.dev/knowledge/openspec/) is a lightweight  approach to spec-driven development that treats a single, unified specification as the source of truth for a system. By defining **intent before implementation**, it improves clarity, strengthens traceability from requirements to code, and helps keep humans and AI assistants aligned throughout the development process.
 
 In this post we'll use OpenSpec to drive a small project: a local [Apache Kafka](https://kafka.apache.org/) producer and consumer in Python.  The code will demonstrate how to stand up a local Kafka server and connect with a [Confluent Python client](https://docs.confluent.io/kafka-clients/python/current/overview.html).  The focus here is on how OpenSpec shapes the work and the benefits you get from it.
 
