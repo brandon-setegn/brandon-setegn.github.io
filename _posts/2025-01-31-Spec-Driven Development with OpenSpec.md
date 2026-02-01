@@ -26,8 +26,8 @@ In this post we'll use OpenSpec to drive a small project: a local [Apache Kafka]
 
 Two folders structure the work:
 
-- **specs/** — The current state of the system.  Each spec describes a capability (e.g. local Kafka, Python clients) with requirements and scenarios in a consistent format.
-- **changes/** — Proposed deltas.  A change typically has a proposal (why and what), a design (decisions and trade-offs), and a task list.  When done, the change is archived so the history is preserved.
+- `specs/` — The current state of the system.  Each spec describes a capability (e.g. local Kafka, Python clients) with requirements and scenarios in a consistent format.
+- `changes/` — Proposed deltas.  A change typically has a proposal (why and what), a design (decisions and trade-offs), and a task list.  When done, the change is archived so the history is preserved.
 
 Benefits:
 
