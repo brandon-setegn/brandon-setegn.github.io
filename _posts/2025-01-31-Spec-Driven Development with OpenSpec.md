@@ -8,11 +8,11 @@ image:
   path: /assets/img/openspec-header.png
 ---
 
-When I originally started working on this post I thought it was going to be about Kafka and how to get started with it.  But over the last few weeks I started to do to more _spec-driven development_, mainly with OpenSpec.  Having seen the how incredibly powerful spec-driven can be, I had to pivot to this new topic.
+When I originally started working on this post I thought it was going to be about Kafka and how to get started with it.  But over the last few weeks I started to do to more _spec-driven development_, mainly with OpenSpec.  Having seen how powerful this workflow can be and how it enables you to fully utilize AI coding, I pivoted to this topic.
 
-[OpenSpec](https://intent-driven.dev/knowledge/openspec/) is a lightweight  approach to spec-driven development that treats a single, unified specification as the source of truth for a system. By defining **intent before implementation**, it improves clarity, strengthens traceability from requirements to code, and helps keep humans and AI assistants aligned throughout the development process.
+[OpenSpec](https://intent-driven.dev/knowledge/openspec/) is a lightweight approach to spec-driven development that treats a single, unified specification as the source of truth for a system. By defining **intent before implementation**, it improves clarity, strengthens traceability from requirements to code, and helps keep humans and AI assistants aligned throughout the development process.
 
-In this post we'll use OpenSpec to drive a small project: a local [Apache Kafka](https://kafka.apache.org/) producer and consumer in Python.  The code will demonstrate how to stand up a local Kafka server and connect with a [Confluent Python client](https://docs.confluent.io/kafka-clients/python/current/overview.html).  The focus here is on how OpenSpec shapes the work and the benefits you get from it.
+In this post we use OpenSpec to drive a small project: a local [Apache Kafka](https://kafka.apache.org/) producer and consumer in Python.  The code shows how to stand up a local Kafka server and connect with a [Confluent Python client](https://docs.confluent.io/kafka-clients/python/current/overview.html).  The focus here is on how OpenSpec shapes the work and the benefits you get from it.
 
 > 💡**OpenSpec keeps a living spec as the source of truth.  Instead of scattering design across tickets and wikis, you maintain specs and changes that evolve with the codebase—improving clarity, traceability, and alignment with AI assistants.**
 
@@ -37,6 +37,34 @@ Benefits:
 - **Lighter than heavy design docs** — OpenSpec aims for enough structure to guide work without drowning in process.  It works with Cursor, Claude Code, and other AI coding tools.
 
 No code lives in the specs themselves.  They describe *what* the system shall do.  The code lives in the repo and is tied to the spec via the change workflow.
+
+## OpenSpec Workflow
+
+Using the OpenSpec workflow properly leads to better code.  You agree on intent and structure before implementation, so the assistant has a clear target and you get traceable, reviewable changes.  The flow is **fluid** (actions, not locked phases).  You use **OPSX** slash commands such as `/opsx:new`, `/opsx:ff`, `/opsx:apply`, and `/opsx:archive`.  For patterns and when to use each, see the [OpenSpec site](https://openspec.dev/) and [Workflows doc](https://github.com/Fission-AI/OpenSpec/blob/main/docs/workflows.md).
+
+Run `openspec init` in a project to set up OpenSpec.  The CLI creates the `openspec/` folder (specs, changes, config) and installs integration for your chosen AI coding tool so slash commands and workflow guidance are available in chat.  During init you select which tool(s) to support.  The result is **skills** that teach the assistant how to run the OpenSpec workflow.  A skill is a persistent instruction set stored in the project (multiple steps, slash commands, artifacts) that gives the assistant consistent behavior across chat sessions.
+
+**Specs** live in `openspec/specs/` and are the source of truth for how the system currently behaves.  **Changes** live in `openspec/changes/<change-name>/`.  Each change has artifacts (proposal, design, tasks) and its own specs folder that describes what is being added or modified.  When you archive the change, those specs merge into `openspec/specs/`, which become the updated source of truth.
+
+As you move through the workflow (proposal → specs → design → tasks → implement → verify → archive), you are also **filling the context window** with the right content.  The assistant sees the proposal, the specs, the design, and the task list.  That context is critical.  It keeps the model aligned with intent and reduces drift, so implementation stays on target and the code you get is better.
+
+```mermaid
+flowchart TB
+  newChange["/opsx:new"]
+  createArtifacts["Create artifacts: proposal, specs, design, tasks"]
+  applyCmd["/opsx:apply"]
+  verifyCmd["/opsx:verify optional"]
+  archiveCmd["/opsx:archive"]
+  mergeSpecs["Change specs merge into main specs"]
+
+  newChange --> createArtifacts
+  createArtifacts --> applyCmd
+  applyCmd --> verifyCmd
+  verifyCmd --> archiveCmd
+  archiveCmd --> mergeSpecs
+```
+
+We will see this workflow in practice when we walk through a concrete change in the kafka-test project.
 
 ## Project Overview: kafka-test
 
@@ -174,13 +202,14 @@ Optional: copy `.env.example` to `.env` and set `ZOOKEEPER_PORT` or `KAFKA_PORT`
 
 ## Wrapping Up
 
-This post focused on **OpenSpec** and how it drives a small Kafka example.  The specs gave a single source of truth for what “local Kafka” and “Python clients” mean.  The change (proposal, design, tasks) made the path from idea to code explicit and traceable, and the archived change keeps an audit trail.  The implementation still shows Kafka and the Confluent Python client in action—producing and consuming JSON on a local broker—but the narrative emphasized clarity, traceability, and alignment that OpenSpec provides.
- -
+This post focused on **OpenSpec** and how it drives a small Kafka example.  The specs gave a single source of truth for what “local Kafka” and “Python clients” mean.  The change (proposal, design, tasks) made the path from idea to code explicit and traceable, and the archived change keeps an audit trail.  The implementation still shows Kafka and the Confluent Python client in action—producing and consuming JSON on a local broker—but the narrative emphasized how the OpenSpec workflow leads to better code through clarity, traceability, and alignment.
+
 Key takeaways:
 
-- OpenSpec keeps specs as the source of truth and uses a propose → design → implement → archive workflow.
-- The two-folder layout (specs/ and changes/) keeps current state and proposed deltas clear.
-- The kafka-test repo was built and documented using OpenSpec.  All code labeled “From the example” is sourced from that repo.
+- Using the OpenSpec workflow lets you fully utilize agentic AI tools.
+- OpenSpec keeps specs as the source of truth and uses a fluid workflow (proposal → specs → design → tasks → implement → archive).
+- The two-folder layout (specs/ and changes/) keeps current state and proposed work clear.
+- The kafka-test repo was built with OpenSpec.  All code labeled “From the example” is sourced from that repo.
 - You can run the example locally with Docker Compose and Python.  No cloud account is required.
 
 ## Next Steps
